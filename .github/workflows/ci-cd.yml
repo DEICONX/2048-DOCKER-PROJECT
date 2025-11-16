@@ -1,0 +1,76 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      SONAR_HOST_URL: http://98.95.253.231:9000
+      SONAR_PROJECT_KEY: 2048-DOCKER
+      NEXUS_URL: http://98.95.253.231:8081
+      NEXUS_REPO_PATH: repository/js/artifact.zip
+      IMAGE_NAME: deiconx/2048-game:latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies & Build
+        run: |
+          sudo apt-get update && sudo apt-get install -y zip curl
+          npm install
+          npm run build || echo "No build script found"
+          zip -r artifact.zip Dockerfile.nexus-download README.md dist index.html main.js package-lock.json package.json styles.css
+
+      - name: SonarQube Analysis
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+          unzip sonar-scanner.zip -d $HOME
+          export PATH=$PATH:$HOME/sonar-scanner-5.0.1.3006-linux/bin
+          sonar-scanner \
+            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+      - name: Upload Artifact to Nexus
+        run: |
+          curl -u ${{ secrets.NEXUS_USERNAME }}:${{ secrets.NEXUS_PASSWORD }} \
+          --upload-file artifact.zip \
+          $NEXUS_URL/$NEXUS_REPO_PATH
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+          --build-arg NEXUS_URL=$NEXUS_URL \
+          --build-arg REPO_PATH=$NEXUS_REPO_PATH \
+          --build-arg NEXUS_USER=${{ secrets.NEXUS_USERNAME }} \
+          --build-arg NEXUS_PASS=${{ secrets.NEXUS_PASSWORD }} \
+          -f Dockerfile.nexus-download -t $IMAGE_NAME .
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Push Docker Image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy to Remote Server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: 98.95.253.231
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker rm -f 2048-game || true
+            docker pull $IMAGE_NAME
+            docker run -d --name 2048-game -p 80:80 $IMAGE_NAME

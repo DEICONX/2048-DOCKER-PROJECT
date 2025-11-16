@@ -24,7 +24,7 @@ This document summarizes the steps taken to set up a complete CI/CD pipeline for
   git push origin main
   ```
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 100312.png)
+![](Screenshot%202025-11-16%20100312.png)
 
 ### 2. AWS Ubuntu Server Setup
 
@@ -38,7 +38,7 @@ This document summarizes the steps taken to set up a complete CI/CD pipeline for
   sudo apt update && sudo apt upgrade -y
   ```
   
-  ![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 100257.png)
+  ![](Screenshot%202025-11-16%20100257.png)
   
 - Install Docker:
   
@@ -52,7 +52,7 @@ This document summarizes the steps taken to set up a complete CI/CD pipeline for
 
 use `git clone <your URL>`
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 100403.png)  
+![](Screenshot%202025-11-16%20100403.png)  
 
 ### 3. Docker Configuration
 
@@ -63,7 +63,7 @@ use `git clone <your URL>`
   sudo docker pull jenkins/jenkins:lts
   ```
   
-  ![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 100329.png)
+  ![](Screenshot%202025-11-16%20100329.png)
   
 - Run containers:
   
@@ -73,7 +73,7 @@ use `git clone <your URL>`
   sudo docker run -dt --name jenkins -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts
   ```
 
-​      ![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 101737.png)
+​      ![](Screenshot%202025-11-16%20101737.png)
 
 ### 4. Host Server Configuration
 
@@ -106,7 +106,7 @@ RUN unzip -o /tmp/artifact.zip -d /usr/share/nginx/html
 # ensure nginx runs in foreground
 CMD ["/usr/sbin/nginx","-g","daemon off;"]
 ```
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 102501.png)
+![](Screenshot%202025-11-16%20102501.png)
 
 If you want to test your image and upload it to Dockerhub
 
@@ -130,12 +130,12 @@ NOW I HAVE DONE MANUAL SETUP LETS AUTOMATE IT USING JENKINS
   
   - Docker Hub username/token
   
-    ![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 102840.png)
+    ![](Screenshot%202025-11-16%20102840.png)
   
 - Install plugins:
   - GitHub, SCP, Artifact, NodeJS, Nexus, Docker, Deployer, SonarQube Scanner
   
-    ![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 103142.png)
+    ![](Screenshot%202025-11-16%20103142.png)
   
 - Configure tools:
   - NodeJS and JDK paths
@@ -169,13 +169,13 @@ To install sonar-scanner:
 
 `mv sonar-scanner-5.0.1.3006-linux sonar-scanner`
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 112137.png)
+![](Screenshot%202025-11-16%20112137.png)
 
 ### 7. Jenkins Pipeline Script
 
 Create a New item 
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 104123.png)
+![](Screenshot%202025-11-16%20104123.png)
 
 Write Your Pipeline code:
 
@@ -272,13 +272,13 @@ pipeline {
 
 SAVE AND BUILD
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 104158.png)
+![](Screenshot%202025-11-16%20104158.png)
 
 ------
 
 Pipeline Executed Successfully!!!!!
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 123743.png)
+![](Screenshot%202025-11-16%20123743.png)
 
 --------
 
@@ -286,13 +286,13 @@ Lets Now see the outputs:
 
 SONARQUBE OUTPUT:
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 123800.png)
+![](Screenshot%202025-11-16%20123800.png)
 
 -------
 
 NEXUS OUTPUT:
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 123811.png)
+![](Screenshot%202025-11-16%20123811.png)
 
 -----------
 
@@ -300,11 +300,11 @@ DOCKER HUB OUTPUT:
 
 In cli our image is created
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 123834.png)
+![](Screenshot%202025-11-16%20123834.png)
 
 Our image is uploaded to Docker Hub
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 123906.png)
+![](Screenshot%202025-11-16%20123906.png)
 
 --------
 
@@ -312,7 +312,7 @@ NGINX OUTPUT:
 
 our application deployed successfully!!!!!
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 123931.png)
+![](Screenshot%202025-11-16%20123931.png)
 
 -------
 
@@ -324,7 +324,7 @@ CONFIGURE YOUR CREDENTIALS:
 
 Your repo settings-->secrets and variables-->Actions-->new repository secret
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 125114.png)
+![](Screenshot%202025-11-16%20125114.png)
 
 -----
 
@@ -419,7 +419,7 @@ jobs:
             curl -f http://localhost || { echo "Health check failed"; exit 1;}
 ```
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 125219.png)
+![](Screenshot%202025-11-16%20125219.png)
 
 -------------------
 
@@ -427,25 +427,25 @@ COMMIT and visit Actions
 
 Our Pipeline is build successfully!!!!
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 130303.png)
+![](Screenshot%202025-11-16%20130303.png)
 
 ------------------
 
 SONARQUBE OUTPUT:
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 130321.png)
+![](Screenshot%202025-11-16%20130321.png)
 
 -----------------
 
 NEXUS OUTPUT:
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 130337.png)
+![](Screenshot%202025-11-16%20130337.png)
 
 -------------------
 
 DOCKERHUB OUTPUT:
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 130706.png)
+![](Screenshot%202025-11-16%20130706.png)
 
 ----------------
 
@@ -453,7 +453,7 @@ NGINX OUTPUT:
 
 Our application deployed successfully:
 
-![](C:\Users\jagan\Downloads\DOCKERJS-SS\Screenshot 2025-11-16 130350.png)
+![](Screenshot%202025-11-16%20130350.png)
 
 ## Results
 - Complete CI/CD pipeline implemented.

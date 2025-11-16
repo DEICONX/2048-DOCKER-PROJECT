@@ -71,6 +71,14 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
+            echo "Removing old container..."
             docker rm -f 2048-game || true
-            docker pull $IMAGE_NAME
-            docker run -d --name 2048-game -p 80:80 $IMAGE_NAME
+            echo "Pulling latest image..."
+            docker pull deiconx/2048-game:latest
+            echo "Starting new container..."
+            docker run -d --name 2048-game -p 80:80 deiconx/2048-game:latest
+            echo "Checking container status..."
+            docker ps
+            echo "Health check..."
+            curl -f http://localhost || { echo "Health check failed"; exit 1; }

@@ -1,0 +1,55 @@
+Instructions and commands (copy-paste) for Ubuntu EC2 host:
+
+# 1) Launch Ubuntu EC2 (t2.medium or t3.medium), allow ports: 22, 80, 8081 (Nexus), 9000 (SonarQube), 8080 (Jenkins), 50000 (Jenkins agent)
+# SSH into instance:
+ssh -i yourkey.pem ubuntu@YOUR_EC2_IP
+
+# 2) Install Docker & Docker Compose
+sudo apt update && sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release unzip zip
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+# Log out and back in or run: newgrp docker
+
+# 3) Pull and run SonarQube, Nexus, Jenkins (simple single node containers)
+# Create persistent volumes (optional)
+docker pull sonarqube:latest
+docker pull sonatype/nexus3:latest
+docker pull jenkins/jenkins:lts
+# Run Nexus
+docker run -d --name nexus -p 8081:8081 -v nexus-data:/nexus-data sonatype/nexus3:latest
+# Run SonarQube (requires enough memory)
+docker run -d --name sonarqube -p 9000:9000 -e SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonar sonarqube:latest || docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
+# Run Jenkins
+docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts
+
+# Wait for web UIs to be available:
+# Nexus: http://YOUR_EC2_IP:8081
+# SonarQube: http://YOUR_EC2_IP:9000
+# Jenkins: http://YOUR_EC2_IP:8080
+
+# 4) On host: install node & npm & angular-cli (if needed)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs build-essential
+sudo npm install -g @angular/cli
+
+# 5) Clone your GitHub repo (after you push it)
+git clone https://github.com/YOUR_USER/YOUR_REPO.git
+cd YOUR_REPO
+npm ci
+npm run build
+# Verify dist contains files
+ls -la dist
+
+# 6) Run Sonar scan (example using sonar-scanner docker image)
+docker run --rm -e SONAR_HOST_URL=http://localhost:9000 -e SONAR_LOGIN=YOUR_TOKEN -v "$(pwd)":/usr/src -w /usr/src sonarsource/sonar-scanner-cli
+
+# 7) Create artifact zip and upload to Nexus manually (if testing)
+zip -r puzzlegame-2048.zip dist/*
+curl -v -u admin:admin123 --upload-file puzzlegame-2048.zip "http://localhost:8081/repository/js/puzzlegame-2048.zip"
+
+# 8) Build Docker image that downloads artifact from Nexus and serves via nginx:
+docker build --build-arg NEXUS_URL=http://localhost:8081 --build-arg REPO_PATH=repositiory/js/puzzlegame-2048.zip -f Dockerfile.nexus-download -t yourdockeruser/puzzlegame:latest .
+docker run -d -p 80:80 --name puzzlegame yourdockeruser/puzzlegame:latest
+
+# 9) Jenkins: create credentials for Nexus, Sonar, DockerHub; create pipeline job pointing to this repo (Jenkinsfile is in repo).

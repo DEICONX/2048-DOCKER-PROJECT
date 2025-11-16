@@ -1,0 +1,17 @@
+# Dockerfile that downloads artifact (zip or tar.gz) from Nexus and serves it with nginx.
+# Usage:
+# docker build --build-arg NEXUS_URL=http://nexus.example:8081 --build-arg REPO_PATH=repository/js/puzzlegame-2048.zip --build-arg NEXUS_USER=admin --build-arg NEXUS_PASS=pass -f Dockerfile.nexus-download -t yourrepo/puzzlegame:latest .
+# Then run: docker run -p 80:80 yourrepo/puzzlegame:latest
+FROM nginx:stable-alpine
+ARG NEXUS_URL
+ARG REPO_PATH
+ARG NEXUS_USER
+ARG NEXUS_PASS
+WORKDIR /tmp
+# download artifact from nexus; supports basic auth if provided
+RUN apk add --no-cache curl unzip bash
+# If credentials provided, use them. Otherwise anonymous.
+RUN if [ -n "$NEXUS_USER" ] && [ -n "$NEXUS_PASS" ]; then               curl -fSL -u "$NEXUS_USER:$NEXUS_PASS" "$NEXUS_URL/$REPO_PATH" -o /tmp/artifact.zip ;             else               curl -fSL "$NEXUS_URL/$REPO_PATH" -o /tmp/artifact.zip ;             fi
+RUN unzip -o /tmp/artifact.zip -d /usr/share/nginx/html
+# ensure nginx runs in foreground
+CMD ["/usr/sbin/nginx","-g","daemon off;"] 

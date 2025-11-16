@@ -1,0 +1,10 @@
+{
+  "name": "puzzlegame-2048",
+  "version": "1.0.0",
+  "description": "Simple 2048 puzzle game - static site",
+  "scripts": {
+    "build": "rm -rf dist || true && mkdir -p dist && cp index.html styles.css main.js README.md dist/ && echo 'Built to dist/'"
+  },
+  "author": "generated",
+  "license": "MIT"
+}

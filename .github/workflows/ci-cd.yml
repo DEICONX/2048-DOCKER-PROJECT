@@ -81,4 +81,4 @@ jobs:
             echo "Checking container status..."
             docker ps
             echo "Health check..."
-            curl -f http://localhost || { echo "Health check failed"; exit 1; }
+            curl -f http://localhost || { echo "Health check failed"; exit 1;}

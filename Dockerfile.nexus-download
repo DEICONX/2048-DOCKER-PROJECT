@@ -14,4 +14,4 @@ RUN apk add --no-cache curl unzip bash
 RUN if [ -n "$NEXUS_USER" ] && [ -n "$NEXUS_PASS" ]; then               curl -fSL -u "$NEXUS_USER:$NEXUS_PASS" "$NEXUS_URL/$REPO_PATH" -o /tmp/artifact.zip ;             else               curl -fSL "$NEXUS_URL/$REPO_PATH" -o /tmp/artifact.zip ;             fi
 RUN unzip -o /tmp/artifact.zip -d /usr/share/nginx/html
 # ensure nginx runs in foreground
-CMD ["/usr/sbin/nginx","-g","daemon off;"] 
+CMD ["/usr/sbin/nginx","-g","daemon off;"]
